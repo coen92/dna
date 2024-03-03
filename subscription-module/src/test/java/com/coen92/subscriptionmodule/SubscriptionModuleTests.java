@@ -1,10 +1,10 @@
-package com.coen92.dna;
+package com.coen92.subscriptionmodule;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class DnaApplicationTests {
+class SubscriptionModuleTests {
 
     @Test
     void contextLoads() {
