@@ -2,14 +2,16 @@ package com.coen92.valueobject.course;
 
 import static java.lang.StringTemplate.STR;
 
-public class CourseCapacity {
+public final class CourseCapacity {
     private static final int ON_SITE_COURSE_CAPACITY_LIMIT = 20;
     private final int capacity;
 
+    // private constructor
     private CourseCapacity(int capacity) {
         this.capacity = capacity;
     }
 
+    // VALIDATION of business rules during creation
     public static CourseCapacity of(int capacity) {
         if (capacity < 0) {
             throw new IllegalStateException("Capacity cannot be a negative number");
@@ -30,5 +32,10 @@ public class CourseCapacity {
 
     CourseCapacity withExtraSpace(CourseCapacity extraSpace) {
         return new CourseCapacity(this.capacity + extraSpace.capacity);
+    }
+
+    // BEHAVIOUR to be checked on aggregate level
+    boolean canAccept(int expected) {
+        return this.capacity >= expected;
     }
 }
