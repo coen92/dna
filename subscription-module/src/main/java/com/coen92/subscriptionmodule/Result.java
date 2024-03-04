@@ -1,12 +1,8 @@
 package com.coen92.subscriptionmodule;
 
 import com.coen92.subscriptionmodule.model.DomainEvent;
-import lombok.AllArgsConstructor;
 
-@AllArgsConstructor
-public class Result {
-    private Status status;
-
+public record Result(Status status) {
     public static Result success(DomainEvent event) {
         return Result.ofStatus(Status.OK);
     }
