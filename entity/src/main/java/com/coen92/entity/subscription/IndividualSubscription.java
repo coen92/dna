@@ -7,8 +7,9 @@ import java.time.Instant;
 
 import static java.lang.StringTemplate.STR;
 
-public class IndividualSubscription {
-    private SubscriptionId id;
+@AllArgsConstructor
+class IndividualSubscription {
+    private final SubscriptionId id;
     Status status;
     PauseInformation pauseInfo;
     DisableReason disableReason;
