@@ -1,7 +1,10 @@
 package com.coen92.valueobject.course;
 
+import lombok.EqualsAndHashCode;
+
 import static java.lang.StringTemplate.STR;
 
+@EqualsAndHashCode(of = "capacity")
 public final class CourseCapacity {
     private static final int ON_SITE_COURSE_CAPACITY_LIMIT = 20;
     private final int capacity;
