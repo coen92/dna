@@ -26,16 +26,21 @@ public final class CourseCapacity {
         return of(capacity);
     }
 
+    // BEHAVIOUR to be checked on aggregate level
+    boolean canAccept(int expected) {
+        return this.capacity >= expected;
+    }
+
+    // COMPOSITION method for CourseCapacity
+    CourseCapacity add(CourseCapacity courseCapacity) {
+        return new CourseCapacity(capacity + courseCapacity.capacity);
+    }
+
     private static boolean assertOnSiteCourseLimit(int capacity, Course course) {
         return course.isOnSite() && capacity > ON_SITE_COURSE_CAPACITY_LIMIT;
     }
 
     CourseCapacity withExtraSpace(CourseCapacity extraSpace) {
         return new CourseCapacity(this.capacity + extraSpace.capacity);
-    }
-
-    // BEHAVIOUR to be checked on aggregate level
-    boolean canAccept(int expected) {
-        return this.capacity >= expected;
     }
 }
