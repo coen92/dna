@@ -12,6 +12,7 @@
     <modules>
         <module>value-object</module>
         <module>subscription-module</module>
+        <module>entity</module>
     </modules>
 
     <groupId>com.coen92</groupId>
