@@ -3,18 +3,16 @@ package com.coen92.subscriptionmodule.model;
 import com.coen92.subscriptionmodule.Result;
 import lombok.NoArgsConstructor;
 
-import java.time.Duration;
 import java.time.Instant;
 
 @NoArgsConstructor
 public class Subscription {
     // aggregate shouldn't contain required data but rules for business processes
     private Status status = Status.New;
-    private int availablePauses = 2;
-    private Instant lastPause = null;
-
+    private final Pauses pauses = new Pauses();
     enum Status { New, Activated, Deactivated, Paused, PastDue }
 
+    // business processes are reflected in methods driven by domain events like below
     Result activate(DomainEvent event) {
         status = Status.Activated;
         return Result.success(event);
@@ -30,9 +28,8 @@ public class Subscription {
     }
 
     Result pause(DomainEvent event, Instant when) {
-        if (isActive() && enoughDaysSinceLastPause(when) && anyPauseAvailable()) {
-            availablePauses--;
-            lastPause = when;
+        if (isActive() && pauses.canPauseAt(when)) {
+            pauses.markNewPauseAt(when);
             status = Status.Paused;
             return Result.success(event);
         }
@@ -50,17 +47,6 @@ public class Subscription {
     Result markAsPastDue(DomainEvent event) {
         status = Status.PastDue;
         return Result.success(event);
-    }
-
-    private boolean anyPauseAvailable() {
-        return availablePauses > 0;
-    }
-
-    private boolean enoughDaysSinceLastPause(Instant when) {
-        if (lastPause == null) {
-            return true;
-        }
-        return Duration.between(lastPause, when).toDays() >= 10;
     }
 
     private boolean isActive() {
