@@ -4,59 +4,65 @@ import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+
+import static java.lang.StringTemplate.STR;
 
 public class IndividualSubscription {
     private SubscriptionId id;
-    Instant lastDisablement;
+    Status status;
+    PauseInformation pauseInfo;
+    DisableReason disableReason;
+
+    enum Status {Paused, Active, Disabled}
 
     // no getters, no setters -> mutability through methods following business rules
-    public void disable(DisableReason disableReason) {
-        // disable rules set - CONTEXTUAL INVARIANTS
-        if (disableReason.isEmpty()) {
-            // do not disable
+    // LIFE-CYCLE INVARIANTS
+    public void disable(DisableReason reason) {
+        if (isPaused()) {
+            throw new IllegalStateException(STR."Not allowed to disable \{this.status.name().toLowerCase()} subscriptions!");
         }
-        if (lastDisablement.isBefore(Instant.now().minus(1, ChronoUnit.DAYS))) {
-            // do not disable
-        }
-        // disable rules set - CONSTANT INVARIANTS
-        checkConstantInvariants();
-        // state changes - disable
+        status = Status.Disabled;
+        disableReason = reason;
     }
 
     public void activate() {
-        // activate rules set - CONSTANT INVARIANTS
-        checkConstantInvariants();
-        // state changes - activate
+        status = Status.Active;
     }
 
     public void pause() {
-        // pause rules set - CONSTANT INVARIANTS
-        checkConstantInvariants();
-        // state changes - activate
+        if (isDisabled()) {
+            throw new IllegalStateException(STR."Not allowed to pause \{this.status.name().toLowerCase()} subscriptions!");
+        }
+        status = Status.Paused;
+        pauseInfo = pauseInfo.now();
+    }
+    // if logic of above methods expands too much => EXTRACT to three classes: PausedSubscription, ActiveSubscription, DisabledSubscription
+
+
+    private boolean isDisabled() {
+        return this.status == Status.Disabled;
     }
 
-    private void checkConstantInvariants() {
-        if (id == null) {
-            throw new IllegalStateException("Subscription id must be declared!");
+    private boolean isPaused() {
+        return this.status == Status.Paused;
+    }
+
+    @AllArgsConstructor
+    private static class PauseInformation {
+        String description;
+        Instant pausedAt;
+
+        PauseInformation now() {
+            return new PauseInformation("Subscription paused...", Instant.now());
         }
     }
-
-
 
     @NoArgsConstructor
     @AllArgsConstructor
-    private static class DisableReason {
-        private Reason reason;
+    private enum DisableReason {
+        BLOCKED,
+        NO_PAYMENT,
+        MALFORMED_USER
 
-        boolean isEmpty() {
-            return this.reason == null;
-        }
-
-        private enum Reason {
-            BLOCKED,
-            NO_PAYMENT,
-            MALFORMED_USER
-        }
     }
 }
