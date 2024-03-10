@@ -13,6 +13,7 @@
         <module>value-object</module>
         <module>subscription-module</module>
         <module>entity</module>
+        <module>domainservice</module>
     </modules>
 
     <groupId>com.coen92</groupId>
