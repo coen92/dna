@@ -30,8 +30,8 @@ public record Subscriber(
 
     }
 
-    record LoyaltyPoint(UUID id) {
-        static LoyaltyPoint gainOne() {
+    public record LoyaltyPoint(UUID id) {
+        public static LoyaltyPoint gainOne() {
             var id = UUID.randomUUID();
             return new LoyaltyPoint(id);
         }

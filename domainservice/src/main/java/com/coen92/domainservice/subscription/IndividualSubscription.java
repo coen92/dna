@@ -7,17 +7,28 @@ import lombok.Getter;
 import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class IndividualSubscription implements Subscription {
-    @Getter
     private final SubscriptionId id;
     Status status;
     PauseInformation pauseInfo;
 
-    public IndividualSubscription() {
-        this.id = new SubscriptionId(UUID.randomUUID());
+    enum Status {Paused, Active, Disabled}
+
+    private IndividualSubscription() {
+        this.id = SubscriptionId.of(UUID.randomUUID());
     }
 
-    enum Status {Paused, Active, Disabled}
+    private IndividualSubscription(Status status, PauseInformation pauseInfo) {
+        this.id = SubscriptionId.of(UUID.randomUUID());
+        this.status = status;
+        this.pauseInfo = pauseInfo;
+    }
+
+    public static IndividualSubscription newSub() {
+        return new IndividualSubscription(Status.Active, null);
+    }
+
 
     @Override
     public Result pause(PausingPolicy policy) {
@@ -32,7 +43,6 @@ public class IndividualSubscription implements Subscription {
         private final String description;
         private final Instant pausedAt;
         private final Instant pausedUntil;
-
         public PauseInformation(String description, Instant pausedAt, Instant pausedUntil) {
             this.description = description;
             this.pausedAt = pausedAt;

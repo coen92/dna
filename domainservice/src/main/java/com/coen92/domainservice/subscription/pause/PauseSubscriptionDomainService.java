@@ -5,10 +5,12 @@ import com.coen92.domainservice.subscription.Result;
 import com.coen92.domainservice.subscription.Subscriber;
 import com.coen92.domainservice.subscription.policy.PremiumPausingPolicy;
 import com.coen92.domainservice.subscription.policy.StandardPausingPolicy;
+import lombok.NoArgsConstructor;
 
 // domain service example
 // kept in domain layer for Subscription domain
 // can be injected and used in application layer that orchestrates domain processes
+@NoArgsConstructor
 class PauseSubscriptionDomainService {
 
     Result pause(Subscriber subscriber, IndividualSubscription subscription) {
