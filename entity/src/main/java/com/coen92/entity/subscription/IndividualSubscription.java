@@ -1,18 +1,21 @@
 package com.coen92.entity.subscription;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.Getter;
 
 import java.time.Instant;
 
-import static java.lang.StringTemplate.STR;
-
 @AllArgsConstructor
 class IndividualSubscription {
+    @Getter
     private final SubscriptionId id;
     Status status;
     PauseInformation pauseInfo;
     DisableReason disableReason;
+
+    private IndividualSubscription(SubscriptionId id) {
+        this.id = id;
+    }
 
     enum Status {Paused, Active, Disabled}
 
@@ -48,19 +51,22 @@ class IndividualSubscription {
         return this.status == Status.Paused;
     }
 
-    @AllArgsConstructor
+    @Getter
     private static class PauseInformation {
-        String description;
-        Instant pausedAt;
+        private final String description;
+        private final Instant pausedAt;
+
+        public PauseInformation(String description, Instant pausedAt) {
+            this.description = description;
+            this.pausedAt = pausedAt;
+        }
 
         PauseInformation now() {
             return new PauseInformation("Subscription paused...", Instant.now());
         }
     }
 
-    @NoArgsConstructor
-    @AllArgsConstructor
-    private enum DisableReason {
+    enum DisableReason {
         BLOCKED,
         NO_PAYMENT,
         MALFORMED_USER

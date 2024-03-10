@@ -2,6 +2,8 @@ package com.coen92.entity.memento;
 
 import com.coen92.entity.subscription.SubscriptionId;
 import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -24,11 +26,17 @@ public class IndividualSubscription {
         this.pauseInfo = PauseInformation.pauseUntil(Instant.now().plus(DEFAULT_DAYS_FOR_PAUSE, ChronoUnit.DAYS));
     }
 
-    @AllArgsConstructor
-    private static class PauseInformation {
-        String description;
-        Instant pausedAt;
-        Instant pausedUntil;
+    @Getter
+    static class PauseInformation {
+        private final String description;
+        private final Instant pausedAt;
+        private final Instant pausedUntil;
+
+        public PauseInformation(String description, Instant pausedAt, Instant pausedUntil) {
+            this.description = description;
+            this.pausedAt = pausedAt;
+            this.pausedUntil = pausedUntil;
+        }
 
         static IndividualSubscription.PauseInformation pauseUntil(Instant until) {
             return new IndividualSubscription.PauseInformation("Subscription paused...", Instant.now(), until);
