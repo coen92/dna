@@ -14,6 +14,7 @@
         <module>subscription-module</module>
         <module>entity</module>
         <module>domainservice</module>
+        <module>event-publishing</module>
     </modules>
 
     <groupId>com.coen92</groupId>
