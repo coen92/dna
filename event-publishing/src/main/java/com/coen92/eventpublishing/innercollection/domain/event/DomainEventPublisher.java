@@ -8,5 +8,9 @@ import java.util.Collection;
 @FunctionalInterface
 public interface DomainEventPublisher {
     // implementation in particular classes of Infrastructure layer
-    void publish(Collection<DomainEvent> events);
+    void publish(DomainEvent event);
+
+    default void publish(Collection<DomainEvent> events) {
+        events.forEach(this::publish);
+    }
 }
