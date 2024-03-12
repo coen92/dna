@@ -1,4 +1,4 @@
-package com.coen92.eventpublishing.innercollection;
+package com.coen92.eventpublishing.innercollection.domain.subscription;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import java.time.Instant;
 
 @RequiredArgsConstructor
-class IndividualSubscription extends Entity {
+public class IndividualSubscription extends Entity {
     @Getter
     private final boolean disabled;
     @Getter

@@ -1,4 +1,6 @@
-package com.coen92.eventpublishing.innercollection;
+package com.coen92.eventpublishing.innercollection.domain.subscription;
+
+import com.coen92.eventpublishing.innercollection.domain.event.DomainEvent;
 
 import java.util.ArrayList;
 import java.util.Collection;
