@@ -1,8 +1,10 @@
 package com.coen92.dna.pruchase;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PurchaseService {
@@ -17,7 +19,15 @@ public class PurchaseService {
     }
 
     void removeProduct(PurchaseId purchaseId, Product product) {
-
+        var purchase = repository.findById(purchaseId);
+        if (purchase == null)
+            throw new IllegalStateException("No valid purchase found!");
+        if (!purchase.getProducts().contains(product)) {
+            log.warn("No product of this kind in the purchase!");
+            return;
+        }
+        purchase.removeProduct(product);
+        repository.save(purchase);
     }
 
     void removeFreeProductIntentionally(PurchaseId purchaseId, Product product) {

@@ -1,6 +1,7 @@
 package com.coen92.dna.pruchase;
 
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +14,7 @@ import static java.util.stream.Collectors.groupingBy;
 @EqualsAndHashCode
 class Purchase {
     final PurchaseId id;
+    @Getter
     private List<Product> products = new ArrayList<>();
 
     public Purchase(PurchaseId id) {
@@ -29,5 +31,9 @@ class Purchase {
 
     public void addProduct(Product product) {
         products.add(product);
+    }
+
+    public void removeProduct(Product product) {
+        products.remove(product);
     }
 }
