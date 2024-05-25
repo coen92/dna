@@ -1,10 +1,13 @@
 package com.coen92.dna.pruchase;
 
-import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 
 import java.util.UUID;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class PurchaseServiceTest {
     private static final PurchaseId PURCHASE_ID = new PurchaseId(UUID.randomUUID());
@@ -12,7 +15,13 @@ class PurchaseServiceTest {
     private final Product DDD_BOOK = new Product("DDD BOOK");
 
     PurchaseRepository repository = new PurchaseRepositoryImpl();
-    PurchaseService service = new PurchaseService(repository);
+    ExtraProductPolicy.BuyOneGetOtherFreePolicy policy = new ExtraProductPolicy.BuyOneGetOtherFreePolicy();
+    PurchaseService service = new PurchaseService(repository, policy);
+
+    @AfterEach
+    void cleanup() {
+        repository.deleteAll();
+    }
 
     @Test
     void can_add_product_to_existing_purchase() {
@@ -24,7 +33,7 @@ class PurchaseServiceTest {
         service.addProduct(PURCHASE_ID, CODING_SUB);
 
         // then
-        Assertions.assertEquals("{CODING SUB=1}", purchase.printView());
+        assertEquals("{CODING SUB=1}", purchase.printView());
     }
 
     @Test
@@ -36,7 +45,7 @@ class PurchaseServiceTest {
         Executable result = () -> service.addProduct(PURCHASE_ID, CODING_SUB);
 
         // then
-        Assertions.assertThrows(IllegalStateException.class, result, "No valid purchase found!");
+        assertThrows(IllegalStateException.class, result, "No valid purchase found!");
     }
 
     @Test
@@ -52,7 +61,7 @@ class PurchaseServiceTest {
         service.removeProduct(PURCHASE_ID, CODING_SUB);
 
         // then
-        Assertions.assertEquals("{}", purchase.printView());
+        assertEquals("{}", purchase.printView());
     }
 
     @Test
@@ -67,6 +76,53 @@ class PurchaseServiceTest {
         service.addProduct(PURCHASE_ID, CODING_SUB);
 
         // then
-        Assertions.assertEquals("{CODING SUB=2}", purchase.printView());
+        assertEquals("{CODING SUB=2}", purchase.printView());
+    }
+
+    @Test
+    void buy_one_subscription_and_get_free_ebook() {
+        // given
+        var purchase = new Purchase(PURCHASE_ID);
+        repository.save(purchase);
+        // and
+        policy.addNewExtraProduct(new ExtraProductPolicy.ExtraProduct(CODING_SUB, DDD_BOOK));
+
+        // when
+        service.addProduct(PURCHASE_ID, CODING_SUB);
+
+        // then
+        assertEquals("{CODING SUB=1, [FREE] DDD BOOK=1}", purchase.printView());
+    }
+
+    @Test
+    void removing_subscription_removes_free_ebook() {
+        // given
+        var purchase = new Purchase(PURCHASE_ID);
+        repository.save(purchase);
+        // and
+        policy.addNewExtraProduct(new ExtraProductPolicy.ExtraProduct(CODING_SUB, DDD_BOOK));
+
+        // when
+        service.addProduct(PURCHASE_ID, CODING_SUB);
+        service.removeProduct(PURCHASE_ID, CODING_SUB);
+
+        // then
+        assertEquals("{}", purchase.printView());
+    }
+
+    @Test
+    void can_remove_free_ebook_but_keep_subscription() {
+        // given
+        var purchase = new Purchase(PURCHASE_ID);
+        repository.save(purchase);
+        // and
+        policy.addNewExtraProduct(new ExtraProductPolicy.ExtraProduct(CODING_SUB, DDD_BOOK));
+        service.addProduct(PURCHASE_ID, CODING_SUB);
+
+        // when
+        service.removeFreeProductIntentionally(PURCHASE_ID, DDD_BOOK);
+
+        // then
+        assertEquals("{CODING SUB=1}", purchase.printView());
     }
 }

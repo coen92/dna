@@ -9,12 +9,14 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class PurchaseService {
     private final PurchaseRepository repository;
+    // it would be reasonable for multiple policies to use PolicyFactory here
+    private final ExtraProductPolicy policy;
 
     void addProduct(PurchaseId purchaseId, Product product) {
         var purchase = repository.findById(purchaseId);
         if (purchase == null)
             throw new IllegalStateException("No valid purchase found!");
-        purchase.addProduct(product);
+        purchase.addProduct(product, policy);
         repository.save(purchase);
     }
 
@@ -26,12 +28,16 @@ public class PurchaseService {
             log.warn("No product of this kind in the purchase!");
             return;
         }
-        purchase.removeProduct(product);
+        purchase.removeProduct(product, policy);
         repository.save(purchase);
     }
 
     void removeFreeProductIntentionally(PurchaseId purchaseId, Product product) {
-
+        var purchase = repository.findById(purchaseId);
+        if (purchase == null)
+            throw new IllegalStateException("No valid purchase found!");
+        purchase.intentionallyRemoveFreeProduct(product);
+        repository.save(purchase);
     }
 
     void restoreFreeProduct(PurchaseId purchaseId, Product product) {

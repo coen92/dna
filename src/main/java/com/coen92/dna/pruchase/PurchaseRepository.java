@@ -1,11 +1,15 @@
 package com.coen92.dna.pruchase;
 
+import org.springframework.stereotype.Repository;
+
 import java.util.HashMap;
 import java.util.Map;
 
+@Repository
 interface PurchaseRepository {
     Purchase findById(PurchaseId id);
     void save(Purchase purchase);
+    void deleteAll();
 }
 
 class PurchaseRepositoryImpl implements PurchaseRepository {
@@ -19,5 +23,10 @@ class PurchaseRepositoryImpl implements PurchaseRepository {
     @Override
     public void save(Purchase purchase) {
         purchases.put(purchase.id, purchase);
+    }
+
+    @Override
+    public void deleteAll() {
+        purchases.clear();
     }
 }
