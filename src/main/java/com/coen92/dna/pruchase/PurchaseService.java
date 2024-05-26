@@ -41,6 +41,10 @@ public class PurchaseService {
     }
 
     void restoreFreeProduct(PurchaseId purchaseId, Product product) {
-
+        var purchase = repository.findById(purchaseId);
+        if (purchase == null)
+            throw new IllegalStateException("No valid purchase found!");
+        purchase.addBackFreeProduct(product, policy);
+        repository.save(purchase);
     }
 }

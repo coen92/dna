@@ -125,4 +125,70 @@ class PurchaseServiceTest {
         // then
         assertEquals("{CODING SUB=1}", purchase.printView());
     }
+
+    @Test
+    void ask_for_previously_returned_free_book() {
+        // given
+        var purchase = new Purchase(PURCHASE_ID);
+        repository.save(purchase);
+        // and
+        policy.addNewExtraProduct(new ExtraProductPolicy.ExtraProduct(CODING_SUB, DDD_BOOK));
+        service.addProduct(PURCHASE_ID, CODING_SUB);
+        // and
+        service.removeFreeProductIntentionally(PURCHASE_ID, DDD_BOOK);
+
+        // when
+        service.restoreFreeProduct(PURCHASE_ID, DDD_BOOK);
+
+        // then
+        assertEquals("{CODING SUB=1, [FREE] DDD BOOK=1}", purchase.printView());
+    }
+
+    @Test
+    void after_getting_two_free_ebooks_someone_wants_third_ebook() {
+        // given
+        var purchase = new Purchase(PURCHASE_ID);
+        repository.save(purchase);
+        // and
+        policy.addNewExtraProduct(new ExtraProductPolicy.ExtraProduct(CODING_SUB, DDD_BOOK));
+
+        // when
+        service.addProduct(PURCHASE_ID, CODING_SUB);
+        service.addProduct(PURCHASE_ID, CODING_SUB);
+        service.addProduct(PURCHASE_ID, DDD_BOOK);
+
+        // then
+        assertEquals("{DDD BOOK=1, CODING SUB=2, [FREE] DDD BOOK=2}", purchase.printView());
+    }
+
+    @Test
+    void disallow_claim_of_free_ebook_that_wasnt_gifted() {
+        // given
+        var purchase = new Purchase(PURCHASE_ID);
+        repository.save(purchase);
+        // and
+        policy.addNewExtraProduct(new ExtraProductPolicy.ExtraProduct(CODING_SUB, DDD_BOOK));
+
+        // when
+        service.restoreFreeProduct(PURCHASE_ID, DDD_BOOK);
+
+        // then
+        assertEquals("{}", purchase.printView());
+    }
+
+    @Test
+    void someone_ask_free_ebook_after_simulating_free_return() {
+        // given
+        var purchase = new Purchase(PURCHASE_ID);
+        repository.save(purchase);
+        // and
+        policy.addNewExtraProduct(new ExtraProductPolicy.ExtraProduct(CODING_SUB, DDD_BOOK));
+
+        // when
+        service.removeFreeProductIntentionally(PURCHASE_ID, DDD_BOOK);
+        service.restoreFreeProduct(PURCHASE_ID, DDD_BOOK);
+
+        // then
+        assertEquals("{}", purchase.printView());
+    }
 }

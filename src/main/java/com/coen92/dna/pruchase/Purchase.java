@@ -20,6 +20,8 @@ class Purchase {
     private List<Product> products = new ArrayList<>();
     @Getter
     private List<Product> freeProducts = new ArrayList<>();
+    @Getter
+    private List<Product> intentionallyRemovedProducts = new ArrayList<>();
 
     public Purchase(PurchaseId id) {
         this.id = id;
@@ -52,7 +54,20 @@ class Purchase {
     }
 
     public void intentionallyRemoveFreeProduct(Product product) {
-        // assert product belongs to free products etc.
-        freeProducts.remove(product);
+        if (freeProducts.contains(product)) {
+            intentionallyRemovedProducts.add(product);
+            freeProducts.remove(product);
+        }
+    }
+
+    public void addBackFreeProduct(Product product, ExtraProductPolicy policy) {
+        if (wasIntentionallyRemoved(product)) {
+            freeProducts.add(product);
+            intentionallyRemovedProducts.remove(product);
+        }
+    }
+
+    private boolean wasIntentionallyRemoved(Product product) {
+        return intentionallyRemovedProducts.contains(product);
     }
 }
